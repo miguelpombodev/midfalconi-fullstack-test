@@ -1,0 +1,44 @@
+version: "3.4"
+
+services:
+  api:
+    build:
+      context: .
+    container_name: falconi_api
+    platform: linux/amd64
+  database:
+    image: postgres
+    platform: linux/amd64
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d FalconiTest -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    container_name: falconi_database
+    networks:
+      - falconi_net
+    environment:
+      - POSTGRES_PASSWORD=docker123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis
+    platform: linux/amd64
+    ports:
+      - "6379:6379"
+    restart: always
+    container_name: falconi_redis
+    networks:
+      - falconi_net
+    command: redis-server --requirepass FalconiTestRedis123!
+
+networks:
+  falconi_net:
+    driver: bridge
+
+volumes:
+  pgdata:
