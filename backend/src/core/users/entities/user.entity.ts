@@ -2,6 +2,7 @@ import { Column } from "typeorm/decorator/columns/Column";
 import { BaseEntity } from "../../common/base.entity";
 import { Entity, JoinColumn, ManyToOne } from "typeorm";
 import { Profile } from "../../profiles/entities/profile.entity";
+import { UserBuilder } from "../builder/user.builder";
 
 @Entity("users")
 export class User extends BaseEntity {
@@ -24,7 +25,12 @@ export class User extends BaseEntity {
   @JoinColumn({ name: "profileId" })
   profile: Profile;
 
-  inactivateUser(): void {
+  inactivateUser(): User {
     this.isActive = false;
+    return this;
+  }
+
+  static builder(): UserBuilder {
+    return new UserBuilder();
   }
 }

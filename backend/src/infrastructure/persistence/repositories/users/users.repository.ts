@@ -11,6 +11,10 @@ export class UsersRepository implements IUserRepository {
     private readonly context: Repository<User>,
   ) {}
 
+  getUserByEmail(email: string): Promise<User | null> {
+    return this.context.findOneBy({ email });
+  }
+
   async updateUser(
     userId: string,
     userData: Partial<User>,
