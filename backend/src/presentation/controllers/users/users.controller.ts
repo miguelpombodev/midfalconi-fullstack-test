@@ -17,10 +17,10 @@ import {
   Query,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { CreateUserRequest } from "src/application/users/contracts/createUser.request";
 import { UpdateUserRequest } from "src/application/users/contracts/updateUser.request";
-import { UserIdParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
+import { UserIdParamsDto } from "src/application/users/dtos/UserIdParam.dto";
 import { UsersService } from "src/application/users/services/users.service";
 import { User } from "src/core/users/entities/user.entity";
 import { InjectPinoLogger } from "nestjs-pino/InjectPinoLogger";
@@ -73,6 +73,7 @@ export class UsersController {
   @ApiOperation({ summary: "Inactivate a user" })
   @ApiResponse({ status: 204, description: "User inactivated successfully" })
   @ApiResponse({ status: 400, description: "Bad request" })
+  @ApiParam({ name: "userId", description: "ID of the user to inactivate" })
   async inactivateUser(@Param() params: UserIdParamsDto): Promise<void> {
     await this._usersService.inactivateUserAsync(params.userId);
     await this.cacheManager.del(`user_${params.userId}`);
@@ -84,6 +85,7 @@ export class UsersController {
   @ApiOperation({ summary: "Retrieve user by its id" })
   @ApiResponse({ status: 200, description: "User informations" })
   @ApiResponse({ status: 400, description: "Bad request" })
+  @ApiParam({ name: "userId", description: "ID of the user to inactivate" })
   async findOneUser(@Param() params: UserIdParamsDto): Promise<User | null> {
     const cachedUser = await this.cacheManager.get<User>(
       `user_${params.userId}`,
@@ -105,6 +107,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 204, description: "User's data update" })
   @ApiResponse({ status: 400, description: "Bad request" })
+  @ApiParam({ name: "userId", description: "ID of the user to inactivate" })
   async updateOneUser(
     @Param() params: UserIdParamsDto,
     @Body() body: UpdateUserRequest,
@@ -119,6 +122,7 @@ export class UsersController {
   @ApiOperation({ summary: "Deletes a user by its id" })
   @ApiResponse({ status: 204, description: "User deleted successfully" })
   @ApiResponse({ status: 400, description: "Bad request" })
+  @ApiParam({ name: "userId", description: "ID of the user to inactivate" })
   async deleteOneUser(@Param() params: UserIdParamsDto): Promise<void> {
     await this._usersService.deleteUserAsync(params.userId);
     await this.cacheManager.del(`user_${params.userId}`);
