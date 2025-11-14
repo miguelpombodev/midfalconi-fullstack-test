@@ -14,6 +14,7 @@ A robust NestJS backend application demonstrating enterprise-level architecture 
 - [Prerequisites](#prerequisites)
 - [Installation & Setup](#installation--setup)
 - [Environment Variables](#environment-variables)
+- [Caching with Redis](#caching-with-redis)
 - [Running the Application](#running-the-application)
 - [Database Management](#database-management)
 - [API Documentation](#api-documentation)
@@ -71,6 +72,7 @@ src/
 | **Language** | TypeScript 5.7 |
 | **Database** | PostgreSQL 14+ |
 | **ORM** | TypeORM 0.3 |
+| **Caching** | Redis with @nestjs/cache-manager |
 | **Package Manager** | pnpm |
 | **API Docs** | Swagger/OpenAPI |
 | **Logging** | Pino |
@@ -134,6 +136,166 @@ DB_DATABASE=falconi_test
 
 - **Development**: `synchronize: true` allows automatic schema updates (use with caution)
 - **Production**: `synchronize: false` requires explicit migrations
+
+## 💾 Caching with Redis
+
+### Overview
+
+This project uses **Redis** as a caching layer through `@nestjs/cache-manager` with `cache-manager-ioredis` adapter. Redis helps improve application performance by caching frequently accessed data and reducing database queries.
+
+### Redis Configuration
+
+#### Environment Variables
+
+Add these variables to your `.env` file:
+
+```env
+# Redis Configuration (Optional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+```
+
+#### Default Values
+
+If Redis environment variables are not provided, the application will use sensible defaults:
+- **Host**: `localhost`
+- **Port**: `6379`
+- **Database**: `0`
+
+### Setup & Installation
+
+#### 1. Install Dependencies
+
+The required packages are already installed:
+
+```bash
+pnpm add @nestjs/cache-manager cache-manager cache-manager-ioredis ioredis
+```
+
+#### 2. Running Redis Locally
+
+**Using Docker** (Recommended):
+
+```bash
+# Start Redis container
+docker run -d -p 6379:6379 --name redis-cache redis:latest
+
+# Stop Redis container
+docker stop redis-cache
+
+# Remove Redis container
+docker rm redis-cache
+```
+
+**Using Docker Compose**:
+
+The `docker-compose.development.yaml` and `docker-compose.yaml` files include Redis service configuration. Start them with:
+
+```bash
+docker-compose -f docker-compose.development.yaml up
+```
+
+**Installing Locally** (macOS with Homebrew):
+
+```bash
+brew install redis
+brew services start redis
+brew services stop redis
+```
+
+### Using Cache in the Application
+
+#### Basic Cache Decorator Usage
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { Cacheable } from '@nestjs/cache-manager';
+
+@Injectable()
+export class UsersService {
+  
+  @Cacheable()
+  async findAllUsers(): Promise<User[]> {
+    // Database query here
+    return users;
+  }
+
+  @Cacheable({ ttl: 300 }) // 5 minutes TTL
+  async findUserById(userId: string): Promise<User> {
+    return await this.usersRepository.findOne(userId);
+  }
+}
+```
+
+#### Cache Manager API
+
+```typescript
+import { Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+
+@Injectable()
+export class ProfilesService {
+  
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+
+  async getProfile(profileId: string): Promise<Profile> {
+    // Try to get from cache
+    const cachedProfile = await this.cacheManager.get(`profile:${profileId}`);
+    
+    if (cachedProfile) {
+      return cachedProfile;
+    }
+
+    // Get from database
+    const profile = await this.profilesRepository.findOne(profileId);
+
+    // Store in cache (30 minutes TTL)
+    await this.cacheManager.set(`profile:${profileId}`, profile, 1800000);
+
+    return profile;
+  }
+
+  async invalidateProfileCache(profileId: string): Promise<void> {
+    await this.cacheManager.del(`profile:${profileId}`);
+  }
+}
+```
+
+### Cache Configuration
+
+Cache behavior is configured in `app.module.ts`:
+
+- **TTL (Time To Live)**: Default expiration time for cached values
+- **Max Size**: Maximum number of items stored in cache
+- **Adapter**: Using `cache-manager-ioredis` for Redis support
+
+### Best Practices
+
+1. **Cache Key Naming**: Use descriptive prefixes (e.g., `profile:123`, `user:emails`)
+2. **TTL Management**: Set appropriate TTL values based on data freshness requirements
+3. **Cache Invalidation**: Always invalidate cache when data is updated
+4. **Monitoring**: Monitor Redis memory usage in production
+5. **Fallback Strategy**: Always have a database fallback if cache fails
+
+### Monitoring Redis
+
+Check Redis status and memory usage:
+
+```bash
+# Connect to Redis CLI
+redis-cli
+
+# Inside redis-cli:
+PING                    # Test connection
+INFO memory             # Memory stats
+DBSIZE                  # Number of keys
+KEYS *                  # List all keys
+FLUSHDB                 # Clear current database
+FLUSHALL                # Clear all databases
+```
 
 ## ▶️ Running the Application
 
