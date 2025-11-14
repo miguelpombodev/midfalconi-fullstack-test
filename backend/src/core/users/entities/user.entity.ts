@@ -1,7 +1,7 @@
 import { Column } from "typeorm/decorator/columns/Column";
 import { BaseEntity } from "../../common/base.entity";
 import { Entity, JoinColumn, ManyToOne } from "typeorm";
-import { Profile } from "src/core/profiles/entities/profile.entity";
+import { Profile } from "../../profiles/entities/profile.entity";
 
 @Entity("users")
 export class User extends BaseEntity {
