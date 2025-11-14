@@ -49,18 +49,18 @@ export class UsersController {
   }
 
   @Put(":userId")
-  @HttpCode(200)
+  @HttpCode(204)
   @ApiOperation({
     summary:
       "Updates data for a single user, using its id as parameter and requiring the rest of the data in its body",
   })
-  @ApiResponse({ status: 200, description: "User's data update" })
+  @ApiResponse({ status: 204, description: "User's data update" })
   @ApiResponse({ status: 400, description: "Bad request" })
   async updateOneUser(
     @Param() params: FindOneUserParamsDto,
     @Body() body: UpdateUserRequest,
-  ): Promise<User | null> {
-    return await this._usersService.updateUserAsync(params.userId, body);
+  ): Promise<void> {
+    await this._usersService.updateUserAsync(params.userId, body);
   }
 
   @Delete(":userId")
