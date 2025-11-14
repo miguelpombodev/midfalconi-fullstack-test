@@ -55,6 +55,14 @@ export class UsersService {
   }
 
   async findOneUserAsync(userId: string): Promise<User | null> {
+    const checkUser = await this._usersRepository.getById(userId);
+
+    if (!checkUser) {
+      this._logger.warn(
+        `There was an attempt to update a non-existing user with id: ${userId}`,
+      );
+      throw new NotFoundException("User not found");
+    }
     const user = await this._usersRepository.getById(userId);
     return user;
   }
@@ -64,6 +72,14 @@ export class UsersService {
     userData: Partial<User>,
   ): Promise<User | null> {
     try {
+      const checkUser = await this._usersRepository.getById(userId);
+
+      if (!checkUser) {
+        this._logger.warn(
+          `There was an attempt to update a non-existing user with id: ${userId}`,
+        );
+        throw new NotFoundException("User not found");
+      }
       const updatedUser = await this._usersRepository.updateUser(
         userId,
         userData,
@@ -71,6 +87,25 @@ export class UsersService {
       return updatedUser;
     } catch (error) {
       this._logger.error({ error }, "Error trying to update user's data");
+      throw error;
+    }
+  }
+
+  async deleteUserAsync(userId: string): Promise<void> {
+    try {
+      const checkUser = await this._usersRepository.getById(userId);
+
+      if (!checkUser) {
+        this._logger.warn(
+          `There was an attempt to update a non-existing user with id: ${userId}`,
+        );
+        throw new NotFoundException("User not found");
+      }
+
+      await this._usersRepository.deleteUser(userId);
+      this._logger.info(`User with id ${userId} deleted successfully!`);
+    } catch (error) {
+      this._logger.error({ error }, "Error trying to delete user");
       throw error;
     }
   }

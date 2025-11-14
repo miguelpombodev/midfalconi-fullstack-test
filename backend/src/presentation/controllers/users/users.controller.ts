@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
@@ -60,5 +61,14 @@ export class UsersController {
     @Body() body: UpdateUserRequest,
   ): Promise<User | null> {
     return await this._usersService.updateUserAsync(params.userId, body);
+  }
+
+  @Delete(":userId")
+  @HttpCode(204)
+  @ApiOperation({ summary: "Deletes a user by its id" })
+  @ApiResponse({ status: 204, description: "User deleted successfully" })
+  @ApiResponse({ status: 400, description: "Bad request" })
+  async deleteOneUser(@Param() params: FindOneUserParamsDto): Promise<void> {
+    return await this._usersService.deleteUserAsync(params.userId);
   }
 }
