@@ -19,7 +19,7 @@ import { ApplicationModule } from "./application/application.module";
         username: configService.get<string>("DB_USERNAME"),
         password: configService.get<string>("DB_PASSWORD"),
         database: configService.get<string>("DB_DATABASE"),
-        synchronize: true,
+        synchronize: process.env.NODE_ENV == "production" ? false : true,
         autoLoadEntities: true,
       }),
     }),
