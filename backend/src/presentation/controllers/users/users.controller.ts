@@ -1,6 +1,15 @@
-import { Body, Controller, Get, HttpCode, Param, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+} from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { CreateUserRequest } from "src/application/users/contracts/createUser.request";
+import { UpdateUserRequest } from "src/application/users/contracts/updateUser.request";
 import { FindOneUserParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
 import { UsersService } from "src/application/users/services/users.service";
 import { User } from "src/core/users/entities/user.entity";
@@ -36,5 +45,20 @@ export class UsersController {
     @Param() params: FindOneUserParamsDto,
   ): Promise<User | null> {
     return await this._usersService.findOneUserAsync(params.userId);
+  }
+
+  @Put(":userId")
+  @HttpCode(200)
+  @ApiOperation({
+    summary:
+      "Updates data for a single user, using its id as parameter and requiring the rest of the data in its body",
+  })
+  @ApiResponse({ status: 200, description: "User's data update" })
+  @ApiResponse({ status: 400, description: "Bad request" })
+  async updateOneUser(
+    @Param() params: FindOneUserParamsDto,
+    @Body() body: UpdateUserRequest,
+  ): Promise<User | null> {
+    return await this._usersService.updateUserAsync(params.userId, body);
   }
 }

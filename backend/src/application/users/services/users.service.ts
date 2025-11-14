@@ -58,4 +58,20 @@ export class UsersService {
     const user = await this._usersRepository.getById(userId);
     return user;
   }
+
+  async updateUserAsync(
+    userId: string,
+    userData: Partial<User>,
+  ): Promise<User | null> {
+    try {
+      const updatedUser = await this._usersRepository.updateUser(
+        userId,
+        userData,
+      );
+      return updatedUser;
+    } catch (error) {
+      this._logger.error({ error }, "Error trying to update user's data");
+      throw error;
+    }
+  }
 }
