@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common";
+import { Controller, Get, HttpCode, Param } from "@nestjs/common";
 import { UsersService } from "src/application/users/users.service";
 import { User } from "src/core/users/entities/user.entity";
 
@@ -6,7 +6,9 @@ import { User } from "src/core/users/entities/user.entity";
 export class UsersController {
   constructor(private readonly _usersService: UsersService) {}
 
-  async findOneUser(userId: string): Promise<User | null> {
-    return await this._usersService.findOneUserAsync(userId);
+  @Get(":userId")
+  @HttpCode(200)
+  async findOneUser(@Param() params: any): Promise<User | null> {
+    return await this._usersService.findOneUserAsync(params.userId);
   }
 }
