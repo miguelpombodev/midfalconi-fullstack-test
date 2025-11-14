@@ -11,8 +11,18 @@ export class UsersRepository implements IUserRepository {
     private readonly context: Repository<User>,
   ) {}
 
-  getAll(): Promise<User[]> {
-    return this.context.find();
+  getAll(profileId: string | null): Promise<User[]> {
+    const query = this.context
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.profile", "profile");
+
+    if (profileId) {
+      query.where("user.profileId = :profileId", { profileId });
+    }
+
+    query.orderBy("user.createdAt", "DESC");
+
+    return query.getMany();
   }
 
   getUserByEmail(email: string): Promise<User | null> {

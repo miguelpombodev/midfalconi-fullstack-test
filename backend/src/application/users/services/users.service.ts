@@ -68,9 +68,9 @@ export class UsersService {
     }
   }
 
-  async findAllUsersAsync(): Promise<User[]> {
+  async findAllUsersAsync(profileId: string | null): Promise<User[]> {
     try {
-      const users = await this._usersRepository.getAll();
+      const users = await this._usersRepository.getAll(profileId);
       return users;
     } catch (error) {
       this._logger.error({ error }, "Error trying to retrieve users list");

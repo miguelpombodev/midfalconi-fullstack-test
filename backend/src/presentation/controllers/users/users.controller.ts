@@ -7,8 +7,9 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from "@nestjs/common";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { CreateUserRequest } from "src/application/users/contracts/createUser.request";
 import { UpdateUserRequest } from "src/application/users/contracts/updateUser.request";
 import { UserIdParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
@@ -33,8 +34,14 @@ export class UsersController {
   @ApiOperation({ summary: "Retrieve all users" })
   @ApiResponse({ status: 200, description: "List of users" })
   @ApiResponse({ status: 400, description: "Bad request" })
-  async findAllUsers(): Promise<User[]> {
-    return await this._usersService.findAllUsersAsync();
+  @ApiQuery({
+    name: "profile",
+    required: false,
+    type: String,
+    description: "Filter users by profile ID",
+  })
+  async findAllUsers(@Query("profile") profileId?: string): Promise<User[]> {
+    return await this._usersService.findAllUsersAsync(profileId || null);
   }
 
   @Put(":userId/inactivate")
