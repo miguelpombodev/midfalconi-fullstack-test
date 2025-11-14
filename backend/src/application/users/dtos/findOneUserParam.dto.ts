@@ -1,3 +1,3 @@
-export class FindOneUserParamsDto {
+export class UserIdParamsDto {
   userId: string;
 }

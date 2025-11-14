@@ -44,6 +44,30 @@ export class UsersService {
     }
   }
 
+  async inactivateUserAsync(userId: string): Promise<User | null> {
+    try {
+      const checkUser = await this._usersRepository.getById(userId);
+
+      if (!checkUser) {
+        this._logger.warn(
+          `There was an attempt to inactivate a non-existing user with id: ${userId}`,
+        );
+        throw new NotFoundException("User not found");
+      }
+
+      checkUser.inactivateUser();
+
+      const updatedUser = await this._usersRepository.updateUser(
+        userId,
+        checkUser,
+      );
+      return updatedUser;
+    } catch (error) {
+      this._logger.error({ error }, "Error trying to inactivate user");
+      throw error;
+    }
+  }
+
   async findAllUsersAsync(): Promise<User[]> {
     try {
       const users = await this._usersRepository.getAll();

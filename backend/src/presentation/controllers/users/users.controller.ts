@@ -11,7 +11,7 @@ import {
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { CreateUserRequest } from "src/application/users/contracts/createUser.request";
 import { UpdateUserRequest } from "src/application/users/contracts/updateUser.request";
-import { FindOneUserParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
+import { UserIdParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
 import { UsersService } from "src/application/users/services/users.service";
 import { User } from "src/core/users/entities/user.entity";
 
@@ -37,14 +37,21 @@ export class UsersController {
     return await this._usersService.findAllUsersAsync();
   }
 
+  @Put(":userId/inactivate")
+  @HttpCode(204)
+  @ApiOperation({ summary: "Inactivate a user" })
+  @ApiResponse({ status: 204, description: "User inactivated successfully" })
+  @ApiResponse({ status: 400, description: "Bad request" })
+  async inactivateUser(@Param() params: UserIdParamsDto): Promise<void> {
+    await this._usersService.inactivateUserAsync(params.userId);
+  }
+
   @Get(":userId")
   @HttpCode(200)
   @ApiOperation({ summary: "Retrieve user by its id" })
   @ApiResponse({ status: 200, description: "User informations" })
   @ApiResponse({ status: 400, description: "Bad request" })
-  async findOneUser(
-    @Param() params: FindOneUserParamsDto,
-  ): Promise<User | null> {
+  async findOneUser(@Param() params: UserIdParamsDto): Promise<User | null> {
     return await this._usersService.findOneUserAsync(params.userId);
   }
 
@@ -57,7 +64,7 @@ export class UsersController {
   @ApiResponse({ status: 204, description: "User's data update" })
   @ApiResponse({ status: 400, description: "Bad request" })
   async updateOneUser(
-    @Param() params: FindOneUserParamsDto,
+    @Param() params: UserIdParamsDto,
     @Body() body: UpdateUserRequest,
   ): Promise<void> {
     await this._usersService.updateUserAsync(params.userId, body);
@@ -68,7 +75,7 @@ export class UsersController {
   @ApiOperation({ summary: "Deletes a user by its id" })
   @ApiResponse({ status: 204, description: "User deleted successfully" })
   @ApiResponse({ status: 400, description: "Bad request" })
-  async deleteOneUser(@Param() params: FindOneUserParamsDto): Promise<void> {
+  async deleteOneUser(@Param() params: UserIdParamsDto): Promise<void> {
     return await this._usersService.deleteUserAsync(params.userId);
   }
 }
