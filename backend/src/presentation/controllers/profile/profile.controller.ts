@@ -1,5 +1,5 @@
 import { Controller, Get, HttpCode } from "@nestjs/common";
-import { ProfilesService } from "src/application/profiles/profiles.service";
+import { ProfilesService } from "src/application/profiles/services/profiles.service";
 import { Profile } from "src/core/profiles/entities/profile.entity";
 
 @Controller("profile")
