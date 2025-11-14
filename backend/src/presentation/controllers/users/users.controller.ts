@@ -1,5 +1,6 @@
 import { Controller, Get, HttpCode, Param } from "@nestjs/common";
-import { UsersService } from "src/application/users/users.service";
+import { FindOneUserParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
+import { UsersService } from "src/application/users/services/users.service";
 import { User } from "src/core/users/entities/user.entity";
 
 @Controller("users")
@@ -8,7 +9,9 @@ export class UsersController {
 
   @Get(":userId")
   @HttpCode(200)
-  async findOneUser(@Param() params: any): Promise<User | null> {
+  async findOneUser(
+    @Param() params: FindOneUserParamsDto,
+  ): Promise<User | null> {
     return await this._usersService.findOneUserAsync(params.userId);
   }
 }
