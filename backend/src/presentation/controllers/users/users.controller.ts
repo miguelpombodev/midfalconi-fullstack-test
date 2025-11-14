@@ -1,13 +1,21 @@
 import {
+  CACHE_MANAGER,
+  CacheInterceptor,
+  CacheKey,
+} from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
+import {
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
+  Inject,
   Param,
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
 import { CreateUserRequest } from "src/application/users/contracts/createUser.request";
@@ -15,10 +23,20 @@ import { UpdateUserRequest } from "src/application/users/contracts/updateUser.re
 import { UserIdParamsDto } from "src/application/users/dtos/findOneUserParam.dto";
 import { UsersService } from "src/application/users/services/users.service";
 import { User } from "src/core/users/entities/user.entity";
+import { InjectPinoLogger } from "nestjs-pino/InjectPinoLogger";
+import { PinoLogger } from "nestjs-pino/PinoLogger";
 
 @Controller("users")
 export class UsersController {
-  constructor(private readonly _usersService: UsersService) {}
+  constructor(
+    private readonly _usersService: UsersService,
+
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
+
+    @InjectPinoLogger(UsersService.name)
+    private readonly _logger: PinoLogger,
+  ) {}
 
   @Post()
   @HttpCode(201)
@@ -30,6 +48,8 @@ export class UsersController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey("users_list")
   @HttpCode(200)
   @ApiOperation({ summary: "Retrieve all users" })
   @ApiResponse({ status: 200, description: "List of users" })
@@ -41,7 +61,11 @@ export class UsersController {
     description: "Filter users by profile ID",
   })
   async findAllUsers(@Query("profile") profileId?: string): Promise<User[]> {
-    return await this._usersService.findAllUsersAsync(profileId || null);
+    const allUsers = await this._usersService.findAllUsersAsync(
+      profileId || null,
+    );
+
+    return allUsers;
   }
 
   @Put(":userId/inactivate")
@@ -51,6 +75,8 @@ export class UsersController {
   @ApiResponse({ status: 400, description: "Bad request" })
   async inactivateUser(@Param() params: UserIdParamsDto): Promise<void> {
     await this._usersService.inactivateUserAsync(params.userId);
+    await this.cacheManager.del(`user_${params.userId}`);
+    await this.cacheManager.del("users_list");
   }
 
   @Get(":userId")
@@ -59,6 +85,15 @@ export class UsersController {
   @ApiResponse({ status: 200, description: "User informations" })
   @ApiResponse({ status: 400, description: "Bad request" })
   async findOneUser(@Param() params: UserIdParamsDto): Promise<User | null> {
+    const cachedUser = await this.cacheManager.get<User>(
+      `user_${params.userId}`,
+    );
+
+    if (cachedUser) {
+      this._logger.debug(`Cache hit for user with id: ${params.userId}`);
+      return cachedUser;
+    }
+
     return await this._usersService.findOneUserAsync(params.userId);
   }
 
@@ -75,6 +110,8 @@ export class UsersController {
     @Body() body: UpdateUserRequest,
   ): Promise<void> {
     await this._usersService.updateUserAsync(params.userId, body);
+    await this.cacheManager.del(`user_${params.userId}`);
+    await this.cacheManager.del("users_list");
   }
 
   @Delete(":userId")
@@ -83,6 +120,8 @@ export class UsersController {
   @ApiResponse({ status: 204, description: "User deleted successfully" })
   @ApiResponse({ status: 400, description: "Bad request" })
   async deleteOneUser(@Param() params: UserIdParamsDto): Promise<void> {
-    return await this._usersService.deleteUserAsync(params.userId);
+    await this._usersService.deleteUserAsync(params.userId);
+    await this.cacheManager.del(`user_${params.userId}`);
+    await this.cacheManager.del("users_list");
   }
 }

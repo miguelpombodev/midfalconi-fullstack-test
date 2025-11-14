@@ -6,6 +6,10 @@ import { InfrastructureModule } from "./infrastructure/infrastructure.module";
 import { PresentationModule } from "./presentation/presentation.module";
 import { ApplicationModule } from "./application/application.module";
 import { LoggerModule } from "nestjs-pino";
+import { CacheModule } from "@nestjs/cache-manager";
+import * as ioredisStore from "cache-manager-ioredis";
+
+const REDIS_CACHE_TIME_TO_LIVE = 300;
 
 @Module({
   imports: [
@@ -38,6 +42,18 @@ import { LoggerModule } from "nestjs-pino";
         database: configService.get<string>("DB_DATABASE"),
         synchronize: process.env.NODE_ENV == "production" ? false : true,
         autoLoadEntities: true,
+      }),
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        store: ioredisStore,
+        host: configService.get<string>("REDIS_HOST"),
+        port: configService.get<number>("REDIS_PORT"),
+        password: configService.get<string>("REDIS_PASSWORD"),
+        ttl: REDIS_CACHE_TIME_TO_LIVE,
       }),
     }),
     PresentationModule,
