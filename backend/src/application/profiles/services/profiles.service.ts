@@ -7,7 +7,7 @@ export class ProfilesService {
   constructor(private readonly _profilesRepository: ProfilesRepository) {}
 
   async findAllProfilesAsync(): Promise<Profile[]> {
-    const profiles = await this._profilesRepository.getAllProfiles();
+    const profiles = await this._profilesRepository.getAll();
 
     return profiles;
   }

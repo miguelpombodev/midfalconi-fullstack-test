@@ -39,7 +39,17 @@ export class UsersService {
 
       this._logger.info(`User created with email: ${user.email}`);
     } catch (error) {
-      this._logger.error({ error, userId: id }, "Error creating user");
+      this._logger.error({ error }, "Error creating user");
+      throw error;
+    }
+  }
+
+  async findAllUsersAsync(): Promise<User[]> {
+    try {
+      const users = await this._usersRepository.getAll();
+      return users;
+    } catch (error) {
+      this._logger.error({ error }, "Error trying to retrieve users list");
       throw error;
     }
   }

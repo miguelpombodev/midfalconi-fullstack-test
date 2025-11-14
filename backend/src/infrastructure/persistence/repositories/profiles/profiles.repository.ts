@@ -10,8 +10,7 @@ export class ProfilesRepository implements IProfilesRepository {
     @InjectRepository(Profile)
     private readonly profilesRepository: Repository<Profile>,
   ) {}
-
-  getAllProfiles(): Promise<Profile[]> {
+  getAll(): Promise<Profile[]> {
     const profiles = this.profilesRepository.find();
     return profiles;
   }

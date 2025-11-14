@@ -18,8 +18,20 @@ export class UsersController {
     return await this._usersService.createUserAsync(body);
   }
 
+  @Get()
+  @HttpCode(200)
+  @ApiOperation({ summary: "Retrieve all users" })
+  @ApiResponse({ status: 200, description: "List of users" })
+  @ApiResponse({ status: 400, description: "Bad request" })
+  async findAllUsers(): Promise<User[]> {
+    return await this._usersService.findAllUsersAsync();
+  }
+
   @Get(":userId")
   @HttpCode(200)
+  @ApiOperation({ summary: "Retrieve user by its id" })
+  @ApiResponse({ status: 200, description: "User informations" })
+  @ApiResponse({ status: 400, description: "Bad request" })
   async findOneUser(
     @Param() params: FindOneUserParamsDto,
   ): Promise<User | null> {
