@@ -1,6 +1,6 @@
 # Falconi Fullstack Test - Backend
 <p align="center">
-<img style="width: 15%" src="https://img.shields.io/badge/nestjs-E0234E?logo=nestjs&logoColor=white" alt="NestJS">
+<img style="width: 13%" src="https://img.shields.io/badge/nestjs-E0234E?logo=nestjs&logoColor=white" alt="NestJS">
 <img style="width: 15%" src="https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white" alt="PostgreSQL">
 <img style="width: 11%" src="https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white" alt="Redis">
 </p>
