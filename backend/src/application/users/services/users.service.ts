@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { User } from "../../../core/users/entities/user.entity";
-import { UsersRepository } from "../../../infrastructure/persistence/repositories/users/users.repository";
+import { User } from "src/core/users/entities/user.entity";
+import { UsersRepository } from "src/infrastructure/persistence/repositories/users/users.repository";
 import { CreateUserRequest } from "../contracts/createUser.request";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
 
