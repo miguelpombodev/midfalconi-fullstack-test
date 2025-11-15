@@ -1,0 +1,17 @@
+node_modules
+.pnpm-store
+
+# Cache e output do Next.js
+.next
+
+# Ficheiros de ambiente locais (segurança)
+.env.local
+
+# Logs
+npm-debug.log
+pnpm-debug.log
+
+# Ficheiros do SO e IDE
+.DS_Store
+.vscode
+.idea
