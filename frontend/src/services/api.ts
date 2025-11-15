@@ -1,13 +1,13 @@
 import { CreateUserDto, Profile, UpdateUserDto, User } from "../types";
 
-const API_URL = "http://localhost:3000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const handleResponse = async (res: Response) => {
   if (!res.ok) {
     const error = await res.json();
-    throw new Error(error.message || "Algo deu errado");
+    throw new Error(error.message || "Something went wrong");
   }
-  // Retorna JSON se houver conteúdo, senão retorna void
+
   const contentType = res.headers.get("content-type");
   if (contentType && contentType.includes("application/json")) {
     return res.json();
@@ -16,7 +16,7 @@ const handleResponse = async (res: Response) => {
 };
 
 export const getProfiles = (): Promise<Profile[]> => {
-  return fetch(`${API_URL}/profile`).then(handleResponse); // Ajuste o endpoint se necessário
+  return fetch(`${API_URL}/profile`).then(handleResponse);
 };
 
 export const getUsers = (profileId?: string | null): Promise<User[]> => {
