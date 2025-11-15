@@ -1,8 +1,8 @@
 import { CacheInterceptor, CacheKey } from "@nestjs/cache-manager";
 import { Controller, Get, HttpCode, UseInterceptors } from "@nestjs/common";
 import { ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { ProfilesService } from "src/application/profiles/services/profiles.service";
-import { Profile } from "src/core/profiles/entities/profile.entity";
+import { ProfilesService } from "../../../application/profiles/services/profiles.service";
+import { Profile } from "../../../core/profiles/entities/profile.entity";
 
 @Controller("profile")
 export class ProfileController {

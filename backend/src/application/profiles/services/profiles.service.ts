@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Profile } from "src/core/profiles/entities/profile.entity";
-import { ProfilesRepository } from "src/infrastructure/persistence/repositories/profiles/profiles.repository";
+import { Profile } from "../../../core/profiles/entities/profile.entity";
+import { ProfilesRepository } from "../../../infrastructure/persistence/repositories/profiles/profiles.repository";
 
 @Injectable()
 export class ProfilesService {

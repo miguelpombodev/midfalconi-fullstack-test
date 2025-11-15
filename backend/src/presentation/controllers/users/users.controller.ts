@@ -18,11 +18,11 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from "@nestjs/swagger";
-import { CreateUserRequest } from "src/application/users/contracts/createUser.request";
-import { UpdateUserRequest } from "src/application/users/contracts/updateUser.request";
-import { UserIdParamsDto } from "src/application/users/dtos/UserIdParam.dto";
-import { UsersService } from "src/application/users/services/users.service";
-import { User } from "src/core/users/entities/user.entity";
+import { CreateUserRequest } from "../../../application/users/contracts/createUser.request";
+import { UpdateUserRequest } from "../../../application/users/contracts/updateUser.request";
+import { UserIdParamsDto } from "../../../application/users/dtos/UserIdParam.dto";
+import { UsersService } from "../../../application/users/services/users.service";
+import { User } from "../../../core/users/entities/user.entity";
 import { InjectPinoLogger } from "nestjs-pino/InjectPinoLogger";
 import { PinoLogger } from "nestjs-pino/PinoLogger";
 
