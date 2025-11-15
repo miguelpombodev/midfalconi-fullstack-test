@@ -2,6 +2,8 @@ import { DataSource, DataSourceOptions } from "typeorm";
 
 import "dotenv/config";
 
+const isProduction = __dirname.includes("dist");
+
 export const dataSourceOptions: DataSourceOptions = {
   type: "postgres",
   host: process.env.DB_HOST,
@@ -10,8 +12,12 @@ export const dataSourceOptions: DataSourceOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
 
-  entities: ["src/core/**/*.entity.ts"],
-  migrations: ["src/infrastructure/persistence/migrations/*.ts"],
+  entities: [isProduction ? "dist/core/**/*.js" : "src/core/**/*.entity.ts"],
+  migrations: [
+    isProduction
+      ? "dist/infrastructure/persistence/migrations/*.js"
+      : "src/infrastructure/persistence/migrations/*.ts",
+  ],
   synchronize: false,
   logging: true,
   logger: "formatted-console",
