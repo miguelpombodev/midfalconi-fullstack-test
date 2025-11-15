@@ -19,7 +19,7 @@ services:
 
   api:
     build:
-      context: .
+      context: ../backend
     container_name: falconi_api
     platform: linux/amd64
     environment:
@@ -33,6 +33,12 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=FalconiTestRedis123!
       - DOCKER_ENV=true
+      - JAEGER_HOST=jaeger
+      - JAEGER_PORT=4318
+      - OTEL_SDK_ENABLED=true
+      - OTEL_SERVICE_NAME=falconi-backend
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+      - OTEL_TRACES_EXPORTER=otlp
     ports:
       - "3000:3000"
     restart: on-failure

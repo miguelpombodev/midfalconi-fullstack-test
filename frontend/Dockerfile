@@ -19,11 +19,11 @@ RUN npm i -g pnpm
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --prod
+RUN pnpm install --prod && pnpm add typescript
 
 COPY --from=builder --chown=appuser:appgroup /app/.next ./.next
 COPY --from=builder --chown=appuser:appgroup /app/public ./public
-COPY --from=builder --chown=appuser:appgroup /app/next.config.mjs ./next.config.mjs
+COPY --from=builder --chown=appuser:appgroup /app/next.config.ts ./next.config.ts
 
 USER appuser
 

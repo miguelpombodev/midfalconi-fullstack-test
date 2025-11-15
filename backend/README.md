@@ -1,745 +1,418 @@
-# Falconi Fullstack Test - Backend
+# Mid Falconi Fullstack Test - Backend
+
 <p align="center">
 <img style="width: 12%" src="https://img.shields.io/badge/nestjs-E0234E?logo=nestjs&logoColor=white" alt="NestJS">
 <img style="width: 15%" src="https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white" alt="PostgreSQL">
 <img style="width: 11%" src="https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white" alt="Redis">
+<img style="width: 12%" src="https://img.shields.io/badge/TypeORM-FDB813?logo=typeorm&logoColor=white" alt="TypeORM">
+<img style="width: 15%" src="https://img.shields.io/badge/OpenTelemetry-4B8BBE?logo=opentelemetry&logoColor=white" alt="OpenTelemetry">
+<img style="width: 12%" src="https://img.shields.io/badge/Jaeger-00B4CC?logo=jaeger&logoColor=white" alt="Jaeger">
+<img style="width: 11%" src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" alt="Docker">
 </p>
-A robust NestJS backend application demonstrating enterprise-level architecture patterns with TypeORM, PostgreSQL, Redis and comprehensive API documentation.
 
-## 📋 Table of Contents
+A robust NestJS REST API backend application that manages users and profiles with enterprise-level architecture patterns, comprehensive observability, and production-ready features including caching, distributed tracing, and database persistence.
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
+## Table of Contents
+
+- [Application Overview](#application-overview)
+- [Technology Stack](#technology-stack)
 - [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
+- [Quick Start with Docker](#quick-start-with-docker)
+- [Starting with Docker Compose](#starting-with-docker-compose)
+- [Manual Setup](#manual-setup)
 - [Environment Variables](#environment-variables)
-- [Caching with Redis](#caching-with-redis)
-- [Distributed Tracing with Jaeger & OTEL](#distributed-tracing-with-jaeger--otel)
-- [Running the Application](#running-the-application)
-- [Database Management](#database-management)
+- [Understanding OpenTelemetry & Jaeger](#understanding-opentelemetry--jaeger)
 - [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Testing](#testing)
-- [Scripts](#scripts)
+- [Running Tests](#running-tests)
+- [Available Commands](#available-commands)
+- [Project Architecture](#project-architecture)
 
-## 🎯 Overview
+## Application Overview
 
-This is a NestJS-based REST API that manages users and profiles with the following core features:
+This backend API serves as the core of the Falconi Fullstack Test application. It provides a comprehensive REST API for managing users and profiles with the following capabilities:
 
-- **User Management**: Create, read, update, and delete users
-- **Profile Management**: Organize users by profiles
-- **Database Migrations**: Version-controlled database schema evolution
-- **Database Seeding**: Pre-populated test data
-- **Swagger Documentation**: Interactive API documentation
-- **Logging**: Structured logging with Pino
-- **Validation**: Request validation using class-validator
-- **Testing**: Unit and E2E test coverage
+- User management (create, read, update, delete, activate/deactivate)
+- Profile management with one-to-many user relationships
+- Database persistence with automatic migrations
+- Redis-based caching for performance optimization
+- Structured logging with Pino
+- Comprehensive API documentation with Swagger
+- Request validation using class-validator and class-transformer
+- Distributed tracing and observability with OpenTelemetry and Jaeger
+- Unit and end-to-end testing with Jest
 
-## 🏗️ Architecture
+The application follows clean architecture principles with clear separation of concerns across Core, Application, Infrastructure, and Presentation layers.
 
-This project follows clean architecture principles with a layered structure:
+## Technology Stack
 
-```
-src/
-├── core/              # Business logic and domain entities
-│   ├── common/        # Shared abstractions
-│   ├── profiles/      # Profile domain
-│   └── users/         # User domain
-├── application/       # Use cases and business rules
-│   ├── profiles/      # Profile services
-│   └── users/         # User services
-├── infrastructure/    # External services and data access
-│   ├── persistence/   # Database config, migrations, seeds, repositories
-│   └── ...
-└── presentation/      # API controllers and endpoints
-    └── controllers/   # HTTP request handlers
-```
+| Component | Technology | Version | Purpose |
+|-----------|-----------|---------|---------|
+| Runtime | Node.js | 18+ | JavaScript runtime environment |
+| Framework | NestJS | 11.0.1 | REST API framework with DI and modules |
+| Language | TypeScript | 5.7.3 | Static typing and modern JavaScript |
+| Database | PostgreSQL | 14+ | Relational database |
+| ORM | TypeORM | 0.3.27 | Object-relational mapping with migrations |
+| Cache | Redis | Latest | In-memory data store for caching |
+| Cache Manager | @nestjs/cache-manager | Latest | Abstraction layer for caching |
+| Logging | Pino | Latest | Structured JSON logging |
+| API Docs | Swagger/OpenAPI | 11.2.1 | Interactive API documentation |
+| Observability | OpenTelemetry | Latest | Distributed tracing instrumentation |
+| Tracing UI | Jaeger | Latest | Visualization of distributed traces |
+| Testing | Jest | 29.7.0 | Unit and E2E testing framework |
+| Validation | class-validator | 0.14.2 | DTO validation decorators |
+| Transformation | class-transformer | 0.5.1 | Object transformation |
+| Linting | ESLint | 9 | Code quality and style |
+| Formatting | Prettier | 3.4.2 | Code formatter |
+| Package Manager | pnpm | 8+ | Fast, efficient package management |
 
-### Key Architectural Patterns
+## Prerequisites
 
-- **Repository Pattern**: Abstract data access through interfaces
-- **Builder Pattern**: Flexible object construction (UserBuilder)
-- **Dependency Injection**: Leveraging NestJS built-in DI container
-- **DTOs & Requests**: Data validation at the boundary layer
+- Node.js v18.0.0 or higher
+- pnpm v8.0.0 or higher
+- Docker and Docker Compose (recommended for development)
+- PostgreSQL 14+ (or Docker)
+- Redis (or Docker)
 
-## 🛠️ Tech Stack
+## Quick Start with Docker
 
-| Layer | Technology |
-|-------|-----------|
-| **Runtime** | Node.js |
-| **Framework** | NestJS 11 |
-| **Language** | TypeScript 5.7 |
-| **Database** | PostgreSQL 14+ |
-| **ORM** | TypeORM 0.3 |
-| **Caching** | Redis with @nestjs/cache-manager |
-| **Package Manager** | pnpm |
-| **API Docs** | Swagger/OpenAPI |
-| **Logging** | Pino |
-| **Testing** | Jest, Supertest |
-| **Validation** | class-validator, class-transformer |
-| **Linting** | ESLint |
-| **Formatting** | Prettier |
-
-## 📦 Prerequisites
-
-- **Node.js**: v18.0.0 or higher
-- **pnpm**: v8.0.0 or higher
-- **PostgreSQL**: v14 or higher
-- **Docker** (optional, for containerized development)
-
-## 🚀 Installation & Setup
-
-### 1. Clone and Install Dependencies
+The fastest way to get the application running:
 
 ```bash
-cd backend
+# Build Docker image
+docker build -t falconi-backend:latest .
+
+# Run the application with PostgreSQL and Redis
+docker run -d \
+  --name falconi-app \
+  -p 3000:3000 \
+  -e PORT=3000 \
+  -e NODE_ENV=development \
+  -e DB_HOST=postgres \
+  -e DB_PORT=5432 \
+  -e DB_USERNAME=postgres \
+  -e DB_PASSWORD=postgres \
+  -e DB_DATABASE=falconi_test \
+  -e REDIS_HOST=redis \
+  -e REDIS_PORT=6379 \
+  falconi-backend:latest
+```
+
+The API will be available at http://localhost:3000
+
+## Starting with Docker Compose
+
+Recommended for development as it orchestrates all services:
+
+```bash
+# Start all services in development mode
+docker-compose -f docker-compose.development.yaml up
+
+# Or start in production mode
+docker-compose -f docker-compose.yaml up
+
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f backend
+
+# Stop services
+docker-compose down
+
+# Clean up volumes
+docker-compose down -v
+```
+
+Services will be available at:
+- API: http://localhost:3000
+- Swagger Docs: http://localhost:3000/docs
+- PostgreSQL: localhost:5432
+- Redis: localhost:6379
+- Jaeger UI: http://localhost:16686
+
+The Docker Compose configuration includes:
+- Backend NestJS application
+- PostgreSQL database with health checks
+- Redis cache
+- Jaeger tracing with OpenTelemetry receiver
+- Pre-configured networking and volumes
+
+## Manual Setup
+
+For local development without Docker:
+
+```bash
+# Install dependencies
 pnpm install
-```
 
-### 2. Environment Setup
-
-Create a `.env` file in the backend directory:
-
-```bash
+# Configure environment variables
 cp .env.example .env
-```
 
-### 3. Database Setup
+# Start PostgreSQL (if not already running)
+# On macOS with Homebrew: brew services start postgresql
 
-```bash
-# Run migrations
+# Start Redis (if not already running)
+# On macOS with Homebrew: brew services start redis
+
+# Run database migrations
 pnpm migration:run
 
-# Seed database with initial data
+# Seed initial data
 pnpm seed:run
+
+# Start development server
+pnpm start:dev
 ```
 
-## 🔐 Environment Variables
+The API will be available at http://localhost:3000
 
-Create a `.env` file in the root of the backend directory with the following variables:
+## Environment Variables
+
+Create a `.env` file in the backend root directory with the following configuration:
 
 ```env
-# Server
+# Server Configuration
 PORT=3000
 NODE_ENV=development
 
-# Database
+# Database Configuration
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 DB_DATABASE=falconi_test
-```
 
-### Environment-Specific Notes
-
-- **Development**: `synchronize: true` allows automatic schema updates (use with caution)
-- **Production**: `synchronize: false` requires explicit migrations
-
-## 💾 Caching with Redis
-
-### Overview
-
-This project uses **Redis** as a caching layer through `@nestjs/cache-manager` with `cache-manager-ioredis` adapter. Redis helps improve application performance by caching frequently accessed data and reducing database queries.
-
-### Redis Configuration
-
-#### Environment Variables
-
-Add these variables to your `.env` file:
-
-```env
-# Redis Configuration (Optional)
+# Redis Configuration
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
 REDIS_DB=0
-```
 
-#### Default Values
-
-If Redis environment variables are not provided, the application will use sensible defaults:
-- **Host**: `localhost`
-- **Port**: `6379`
-- **Database**: `0`
-
-### Setup & Installation
-
-#### 1. Install Dependencies
-
-The required packages are already installed:
-
-```bash
-pnpm add @nestjs/cache-manager cache-manager cache-manager-ioredis ioredis
-```
-
-#### 2. Running Redis Locally
-
-**Using Docker** (Recommended):
-
-```bash
-# Start Redis container
-docker run -d -p 6379:6379 --name redis-cache redis:latest
-
-# Stop Redis container
-docker stop redis-cache
-
-# Remove Redis container
-docker rm redis-cache
-```
-
-**Using Docker Compose**:
-
-The `docker-compose.development.yaml` and `docker-compose.yaml` files include Redis service configuration. Start them with:
-
-```bash
-docker-compose -f docker-compose.development.yaml up
-```
-
-**Installing Locally** (macOS with Homebrew):
-
-```bash
-brew install redis
-brew services start redis
-brew services stop redis
-```
-
-### Using Cache in the Application
-
-#### Basic Cache Decorator Usage
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { Cacheable } from '@nestjs/cache-manager';
-
-@Injectable()
-export class UsersService {
-  
-  @Cacheable()
-  async findAllUsers(): Promise<User[]> {
-    // Database query here
-    return users;
-  }
-
-  @Cacheable({ ttl: 300 }) // 5 minutes TTL
-  async findUserById(userId: string): Promise<User> {
-    return await this.usersRepository.findOne(userId);
-  }
-}
-```
-
-#### Cache Manager API
-
-```typescript
-import { Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-
-@Injectable()
-export class ProfilesService {
-  
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
-  async getProfile(profileId: string): Promise<Profile> {
-    // Try to get from cache
-    const cachedProfile = await this.cacheManager.get(`profile:${profileId}`);
-    
-    if (cachedProfile) {
-      return cachedProfile;
-    }
-
-    // Get from database
-    const profile = await this.profilesRepository.findOne(profileId);
-
-    // Store in cache (30 minutes TTL)
-    await this.cacheManager.set(`profile:${profileId}`, profile, 1800000);
-
-    return profile;
-  }
-
-  async invalidateProfileCache(profileId: string): Promise<void> {
-    await this.cacheManager.del(`profile:${profileId}`);
-  }
-}
-```
-
-### Cache Configuration
-
-Cache behavior is configured in `app.module.ts`:
-
-- **TTL (Time To Live)**: Default expiration time for cached values
-- **Max Size**: Maximum number of items stored in cache
-- **Adapter**: Using `cache-manager-ioredis` for Redis support
-
-### Best Practices
-
-1. **Cache Key Naming**: Use descriptive prefixes (e.g., `profile:123`, `user:emails`)
-2. **TTL Management**: Set appropriate TTL values based on data freshness requirements
-3. **Cache Invalidation**: Always invalidate cache when data is updated
-4. **Monitoring**: Monitor Redis memory usage in production
-5. **Fallback Strategy**: Always have a database fallback if cache fails
-
-### Monitoring Redis
-
-Check Redis status and memory usage:
-
-```bash
-# Connect to Redis CLI
-redis-cli
-
-# Inside redis-cli:
-PING                    # Test connection
-INFO memory             # Memory stats
-DBSIZE                  # Number of keys
-KEYS *                  # List all keys
-FLUSHDB                 # Clear current database
-FLUSHALL                # Clear all databases
-```
-
-## 🔍 Distributed Tracing with Jaeger & OTEL
-
-### Overview
-
-This project integrates **OpenTelemetry (OTEL)** and **Jaeger** for distributed tracing capabilities. This enables comprehensive observability by tracking requests through the entire application stack, helping you identify performance bottlenecks, debug issues, and understand service interactions.
-
-### What is Distributed Tracing?
-
-Distributed tracing provides end-to-end visibility into request flows across services:
-- **Trace**: A complete request journey through the system
-- **Span**: Individual operation within a trace (e.g., database query, API call)
-- **Attributes**: Key-value metadata attached to spans
-
-### Setting Up Jaeger
-
-#### 1. Running Jaeger with Docker
-
-```bash
-# Start Jaeger all-in-one container
-docker run -d \
-  --name jaeger \
-  -p 16686:16686 \
-  -p 14268:14268 \
-  -p 14250:14250 \
-  jaegertracing/all-in-one:latest
-
-# Stop Jaeger
-docker stop jaeger
-
-# Remove Jaeger container
-docker rm jaeger
-```
-
-#### 2. Running Jaeger with Docker Compose
-
-The `docker-compose.development.yaml` includes Jaeger service configuration:
-
-```bash
-docker-compose -f docker-compose.development.yaml up
-```
-
-### Accessing Jaeger UI
-
-Once Jaeger is running, access the UI at:
-
-```
-http://localhost:16686/trace/
-```
-
-#### Features in Jaeger UI:
-
-- **Service Selection**: Choose which service's traces to view
-- **Trace Search**: Filter by operation name, tags, duration, and more
-- **Trace Details**: Inspect individual spans, timing, and metadata
-- **Latency Analysis**: Identify slow operations within requests
-- **Service Dependency Graph**: Visualize how services communicate
-
-### Environment Variables for OTEL
-
-Configure OTEL behavior with these environment variables:
-
-```env
 # OpenTelemetry Configuration
 OTEL_SDK_ENABLED=true
 OTEL_SERVICE_NAME=falconi-backend
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
-OTEL_EXPORTER_OTLP_HEADERS=
 OTEL_TRACES_EXPORTER=otlp
-OTEL_NODE_ENABLED_INSTRUMENTATIONS=http,express,pg,typeorm
 ```
 
-### Instrumentation
+For Docker Compose deployments, environment variables are defined in the docker-compose.yaml file and override local .env settings.
 
-The project includes an `instrumentation.ts` file that automatically instruments the application with OTEL:
+Development defaults will be used if variables are not provided. In production, ensure all database and tracing endpoints are properly configured.
 
-**Location**: `src/instrumentation.ts`
+## Understanding OpenTelemetry & Jaeger
 
-This file is loaded before the application starts and automatically captures:
-- HTTP request/response tracing
-- Database queries
-- Service interactions
-- Custom spans from business logic
+### Why Observability Matters
 
-### Example: Creating Custom Spans
+OpenTelemetry (OTEL) and Jaeger are critical components for production systems:
 
-```typescript
-import { trace } from '@opentelemetry/api';
+**OpenTelemetry** provides:
+- Automatic instrumentation of HTTP requests, database queries, and service calls
+- Standard way to collect traces, metrics, and logs
+- Vendor-neutral approach to observability
+- Performance insights with minimal code changes
 
-const tracer = trace.getTracer('my-service');
+**Jaeger** provides:
+- Visual interface to explore distributed traces
+- Identify performance bottlenecks and latency issues
+- Debug complex request flows across services
+- Understand service dependencies and communication patterns
 
-async function processUser(userId: string) {
-  const span = tracer.startSpan('processUser');
-  
-  try {
-    span.setAttributes({
-      'user.id': userId,
-      'operation.type': 'process',
-    });
+### What Gets Traced
 
-    // Your business logic here
-    const user = await this.findUser(userId);
-    
-    span.setStatus({ code: SpanStatusCode.OK });
-    return user;
-  } catch (error) {
-    span.recordException(error);
-    span.setStatus({ 
-      code: SpanStatusCode.ERROR,
-      message: error.message 
-    });
-    throw error;
-  } finally {
-    span.end();
-  }
-}
-```
+The application automatically tracks:
+- Incoming HTTP requests and responses
+- Database queries to PostgreSQL
+- Cache operations
+- Service method calls
+- Errors and exceptions with full stack traces
 
-### Best Practices
+### Accessing Traces
 
-1. **Service Naming**: Use descriptive service names for easy identification
-2. **Span Attributes**: Add meaningful attributes to help with debugging
-3. **Error Tracking**: Always record exceptions in spans
-4. **Sampling**: In production, use sampling to reduce storage costs
-5. **Performance**: Disable tracing in performance-critical paths if needed
-
-### Monitoring Tips
-
-1. **Trace Every Request**: All incoming HTTP requests are automatically traced
-2. **Database Operations**: All database queries appear as spans
-3. **Error Detection**: Red traces indicate errors or exceptions
-4. **Performance Bottlenecks**: Look for spans with long durations
-5. **Service Dependencies**: View the service topology in the Jaeger UI
-
-### Useful Jaeger Queries
-
-In the Jaeger UI search, try these queries:
+Once the application is running, open Jaeger UI:
 
 ```
-# All traces for a service
-service.name = "falconi-backend"
-
-# Traces with errors
-error = true
-
-# Slow operations (>500ms)
-duration > 500ms
-
-# Specific operation
-operation = "POST /users"
-
-# With tags
-span.tags."user.id" = "550e8400-e29b-41d4-a716-446655440000"
+http://localhost:16686
 ```
 
-## ▶️ Running the Application
+Search for traces by:
+- Service name: falconi-backend
+- Operation name: POST /users, GET /users, etc.
+- Tags: user.id, error status, duration
+- Trace duration: Find slow operations
 
-### Development Mode
+### Instrumentation Setup
 
-```bash
-# Watch mode with hot reload
-pnpm start:dev
-```
+The file `src/instrumentation.ts` is automatically loaded before the application starts and configures:
+- OTEL SDK initialization
+- Trace exporters to Jaeger
+- Automatic HTTP instrumentation
+- Custom span attributes and error handling
 
-The API will be available at `http://localhost:3000`  
-Swagger docs at `http://localhost:3000/docs`
+No additional code is needed - all instrumentation is automatic through decorators and middleware.
 
-### Debug Mode
+### Performance Monitoring
 
-```bash
-# With Node debugger
-pnpm start:debug
-```
+Use Jaeger to:
+- Measure endpoint latency percentiles (p50, p99)
+- Identify which operations consume the most time
+- Track error rates and root causes
+- Visualize service call chains
+- Monitor resource usage patterns
 
-### Production Mode
+### Production Considerations
 
-```bash
-# Build the project
-pnpm build
+For production deployments:
+- Enable sampling to reduce storage costs (e.g., sample 10% of traces)
+- Use dedicated Jaeger collectors for high-traffic systems
+- Configure trace retention policies
+- Set up alerts for error rates and latency thresholds
+- Monitor Jaeger storage capacity
 
-# Start the compiled application
-pnpm start:prod
-```
+## API Documentation
 
-### Using Docker Compose
+Interactive API documentation is available at http://localhost:3000/docs when the application is running.
 
-```bash
-# Start services in development mode
-docker-compose -f docker-compose.development.yaml up
+The Swagger interface provides:
+- Complete endpoint listing with request/response schemas
+- Parameter documentation and validation rules
+- Try-it-out functionality to test endpoints directly
+- Real-time API testing without external tools
 
-# Start services in production mode
-docker-compose up
-```
+### Core Endpoints
 
-## 🗄️ Database Management
+**User Management**
+- POST /users - Create a new user (returns 201)
+- GET /users - List all users (supports ?profile filter)
+- GET /users/:userId - Get user by ID
+- PUT /users/:userId - Update user information (returns 204)
+- PUT /users/:userId/inactivate - Deactivate user (returns 204)
+- DELETE /users/:userId - Delete user (returns 204)
 
-### Migrations
+**Profile Management**
+- GET /profile - List all profiles
+- GET /profile/:id - Get profile by ID
 
-Migrations are version-controlled database schema changes.
+All endpoints return appropriate HTTP status codes (200, 201, 204, 400, 404) and include validation error details.
 
-```bash
-# Generate a new migration
-pnpm migration:generate "CreateNewTable"
+## Running Tests
 
-# Run pending migrations
-pnpm migration:run
-
-# Revert the last migration
-pnpm migration:revert
-```
-
-**Location**: `src/infrastructure/persistence/migrations/`
-
-### Database Seeding
-
-Pre-populate the database with initial test data.
-
-```bash
-# Run all seeders
-pnpm seed:run
-```
-
-**Seeders**:
-- `01-CreateProfiles.seeder.ts` - Creates default profiles
-
-**Location**: `src/infrastructure/persistence/seeds/`
-
-## 📚 API Documentation
-
-Interactive Swagger documentation is available at `/docs`
-
-### Key Endpoints
-
-#### Users
-
-- `POST /users` - Create a new user
-- `GET /users` - Get all users (with optional profile filter)
-- `GET /users/:userId` - Get user by ID
-- `PUT /users/:userId` - Update user information
-- `PUT /users/:userId/inactivate` - Inactivate a user
-- `DELETE /users/:userId` - Delete a user
-
-#### Profiles
-
-- `GET /profile` - Retrieve all profiles
-- `GET /profile/:id` - Retrieve profile by ID
-
-### Request/Response Examples
-
-**Create User**
-```json
-POST /users
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john.doe@example.com",
-  "profileId": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
-
-**Update User**
-```json
-PUT /users/550e8400-e29b-41d4-a716-446655440000
-{
-  "firstName": "Jane",
-  "lastName": "Smith",
-  "email": "jane.smith@example.com"
-}
-```
-
-## 📁 Project Structure
-
-### Core Domain
-
-```
-src/core/
-├── common/
-│   ├── abstraction/
-│   │   └── base-repository.interface.ts
-│   └── base.entity.ts
-├── profiles/
-│   ├── abstraction/
-│   │   └── profiles-repository.interface.ts
-│   └── entities/
-│       └── profile.entity.ts
-└── users/
-    ├── abstraction/
-    │   └── user-repository.interface.ts
-    ├── builder/
-    │   └── user.builder.ts
-    └── entities/
-        └── user.entity.ts
-```
-
-### Application Layer
-
-```
-src/application/
-├── profiles/
-│   └── services/
-│       └── profiles.service.ts
-└── users/
-    ├── contracts/
-    │   ├── createUser.request.ts
-    │   └── updateUser.request.ts
-    ├── dtos/
-    │   └── findOneUserParam.dto.ts
-    └── services/
-        └── users.service.ts
-```
-
-### Infrastructure Layer
-
-```
-src/infrastructure/
-└── persistence/
-    ├── config/
-    │   ├── data-source.config.ts
-    │   └── database-seed.config.ts
-    ├── factories/
-    │   └── profile.factory.ts
-    ├── migrations/
-    └── repositories/
-        ├── profiles/
-        └── users/
-    └── seeds/
-        └── 01-CreateProfiles.seeder.ts
-```
-
-### Presentation Layer
-
-```
-src/presentation/
-└── controllers/
-    ├── profile/
-    │   └── profile.controller.ts
-    └── users/
-        └── users.controller.ts
-```
-
-## 💻 Development
-
-### Code Generation
-
-Use NestJS CLI to scaffold new components:
-
-```bash
-# Generate a new service
-pnpm gen-service
-
-# Generate a new controller
-pnpm gen-controller
-
-# Generate a new module
-pnpm gen-module
-```
-
-### Code Formatting & Linting
-
-```bash
-# Format code with Prettier
-pnpm format
-
-# Lint and fix with ESLint
-pnpm lint
-```
-
-### Code Style
-
-- **Language**: TypeScript with strict mode enabled
-- **Formatter**: Prettier (configured in `package.json`)
-- **Linter**: ESLint with TypeScript support
-- **Class Naming**: PascalCase (e.g., `UsersController`, `UsersService`)
-- **File Naming**: kebab-case for files with entity/interface name
-
-## 🧪 Testing
+The project includes comprehensive test coverage with Jest for unit tests and E2E tests.
 
 ### Unit Tests
 
+Run unit tests for services, controllers, and utilities:
+
 ```bash
-# Run all tests
+# Run all unit tests
 pnpm test
 
-# Watch mode for development
+# Run tests in watch mode (re-run on file changes)
 pnpm test:watch
 
 # Generate coverage report
 pnpm test:cov
 
-# Debug mode
+# Run tests with debugging
 pnpm test:debug
 ```
 
-### E2E Tests
+Test files are located alongside source files with `.spec.ts` extension.
+
+### End-to-End Tests
+
+Test the complete API flow including database and external services:
 
 ```bash
-# Run end-to-end tests
+# Run E2E tests
 pnpm test:e2e
+
+# Run E2E tests with watch mode
+pnpm test:e2e --watch
 ```
 
-**Test Location**: `test/app.e2e-spec.ts`
+E2E tests are located in `test/app.e2e-spec.ts` and include:
+- User creation and validation
+- Profile filtering
+- Database persistence
+- Error handling and edge cases
 
-### Test Configuration
+### Test Coverage
 
-- **Framework**: Jest
-- **Coverage Directory**: `coverage/`
-- **Test Pattern**: `*.spec.ts`
+Generate and review test coverage:
 
-## 📜 Scripts
+```bash
+# Generate coverage report
+pnpm test:cov
 
-| Script | Description |
-|--------|-------------|
-| `pnpm start` | Start the application |
-| `pnpm start:dev` | Start with file watching and hot reload |
-| `pnpm start:debug` | Start with debugger enabled |
-| `pnpm start:prod` | Run production build |
-| `pnpm build` | Build the project |
+# View coverage report in browser
+# Coverage output is in coverage/ directory
+```
+
+Test infrastructure includes:
+- Jest configuration for unit and E2E testing
+- Fixtures for test data generation
+- Mocks for external dependencies
+- TypeORM test database setup
+- Transaction rollback between tests for isolation
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm install` | Install project dependencies |
+| `pnpm start:dev` | Start development server with hot reload |
+| `pnpm start:debug` | Start with Node debugger attached |
+| `pnpm start:prod` | Start production build |
+| `pnpm build` | Compile TypeScript to JavaScript |
 | `pnpm format` | Format code with Prettier |
 | `pnpm lint` | Lint and fix code with ESLint |
-| `pnpm test` | Run all unit tests |
+| `pnpm test` | Run unit tests |
 | `pnpm test:watch` | Run tests in watch mode |
 | `pnpm test:cov` | Run tests with coverage report |
-| `pnpm test:debug` | Debug tests with Node inspector |
 | `pnpm test:e2e` | Run end-to-end tests |
-| `pnpm migration:generate` | Generate a new database migration |
-| `pnpm migration:run` | Run pending migrations |
-| `pnpm migration:revert` | Revert the last migration |
-| `pnpm seed:run` | Run database seeders |
-| `pnpm gen-service` | Generate a new service with NestJS CLI |
-| `pnpm gen-controller` | Generate a new controller with NestJS CLI |
-| `pnpm gen-module` | Generate a new module with NestJS CLI |
+| `pnpm migration:generate "Name"` | Generate new database migration |
+| `pnpm migration:run` | Apply pending migrations |
+| `pnpm migration:revert` | Rollback last migration |
+| `pnpm seed:run` | Populate database with seed data |
+| `pnpm gen-service` | Generate new NestJS service |
+| `pnpm gen-controller` | Generate new NestJS controller |
+| `pnpm gen-module` | Generate new NestJS module |
 
-## 🔍 Additional Resources
+## Project Architecture
 
-- [NestJS Documentation](https://docs.nestjs.com)
-- [TypeORM Documentation](https://typeorm.io)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs)
-- [Swagger/OpenAPI Specification](https://swagger.io)
+The application follows clean architecture with clear separation of concerns:
 
-## 📝 License
+**Core Layer** (`src/core/`)
+- Domain entities and business logic
+- Repository interfaces for abstraction
+- No external framework dependencies
 
-Unlicensed - Internal Project
+**Application Layer** (`src/application/`)
+- Use cases and business workflows
+- Service layer orchestration
+- Request/Response DTOs with validation
 
-## 👥 Contributing
+**Infrastructure Layer** (`src/infrastructure/`)
+- Repository implementations using TypeORM
+- Database configuration and migrations
+- External service adapters
 
-This is a test project. For questions or contributions, please contact me.
+**Presentation Layer** (`src/presentation/`)
+- HTTP controllers and route handlers
+- Request parsing and response formatting
+- Swagger documentation
+
+**Design Patterns Used:**
+- Repository Pattern for data access abstraction
+- Builder Pattern for complex object construction
+- Dependency Injection for loose coupling
+- DTO Pattern for request/response validation
+- Service Layer for business logic encapsulation
+
+This architecture ensures testability, maintainability, and scalability by keeping layers independent and allowing for easy modifications without affecting other components.
+
+---
+
+<p align="center">
+<strong>Built with NestJS, TypeORM, PostgreSQL, Redis, and OpenTelemetry</strong>
+</p>
