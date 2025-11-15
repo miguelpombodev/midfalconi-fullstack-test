@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --garnet: #7a123a;
+  --font-epilogue: "Epilogue", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  @apply font-sans;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-bold;
+}
+
+button {
+  @apply font-medium;
+  cursor: pointer;
+}
