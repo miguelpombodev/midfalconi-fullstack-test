@@ -18,6 +18,7 @@ services:
       - falconi_net
     environment:
       - POSTGRES_PASSWORD=docker123
+      - POSTGRES_DB=FalconiTest
     volumes:
       - pgdata:/var/lib/postgresql/data
   redis:
@@ -30,6 +31,14 @@ services:
     networks:
       - falconi_net
     command: redis-server --requirepass FalconiTestRedis123!
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    networks:
+      - falconi_net
 
 networks:
   falconi_net:
