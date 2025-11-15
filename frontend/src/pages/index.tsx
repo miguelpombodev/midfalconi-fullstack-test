@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import * as api from "../services/api";
 import { User, Profile, CreateUserDto, UpdateUserDto } from "../types";
 
 import { UserList } from "../components/UserList";
 import { UserFormModal } from "../components/UserFormModal";
 import { ConfirmationModal } from "../components/ConfirmationModal";
+import { UserListSkeleton } from "@/components/UserListSkeleton";
+import toast from "react-hot-toast";
 
 const Spinner = () => (
   <svg
@@ -32,6 +34,7 @@ const Spinner = () => (
 export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,6 +63,19 @@ export default function Home() {
     }
   };
 
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) {
+      return users;
+    }
+    const lowerQuery = searchQuery.toLowerCase();
+    return users.filter(
+      (user) =>
+        user.firstName.toLowerCase().includes(lowerQuery) ||
+        user.lastName.toLowerCase().includes(lowerQuery) ||
+        user.email.toLowerCase().includes(lowerQuery)
+    );
+  }, [users, searchQuery]);
+
   useEffect(() => {
     loadData();
   }, [filterProfileId]);
@@ -80,13 +96,16 @@ export default function Home() {
     try {
       if (editingUser) {
         await api.updateUser(editingUser.id, data);
+        toast.success("Usuário atualizado com sucesso!");
       } else {
         await api.createUser(data as CreateUserDto);
+        toast.success("Usuário criado com sucesso!");
       }
       setIsFormModalOpen(false);
       await loadData();
     } catch (err) {
       setError((err as Error).message);
+      toast.error((err as Error).message);
     } finally {
       setIsSubmitting(false);
     }
@@ -122,8 +141,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
-      {/* Cabeçalho */}
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+      <h1 className="text-4xl text-center font-bold tracking-tight text-gray-900">
         Gerenciador de Usuários
       </h1>
 
@@ -140,6 +158,14 @@ export default function Home() {
             </option>
           ))}
         </select>
+
+        <input
+          type="search"
+          placeholder="Pesquisar por nome ou email"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:w-auto"
+        />
 
         <button
           type="button"
@@ -158,12 +184,7 @@ export default function Home() {
           </div>
         )}
 
-        {isLoading && (
-          <div className="flex items-center justify-center p-10">
-            <Spinner />
-            <span className="ml-3 text-gray-500">Carregando usuários...</span>
-          </div>
-        )}
+        {isLoading && <UserListSkeleton />}
       </div>
 
       {!isLoading && !error && (
@@ -171,7 +192,7 @@ export default function Home() {
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
               <UserList
-                users={users}
+                users={filteredUsers}
                 onEdit={handleOpenEditModal}
                 onDelete={setDeletingUser}
                 onToggleActive={handleToggleActive}
