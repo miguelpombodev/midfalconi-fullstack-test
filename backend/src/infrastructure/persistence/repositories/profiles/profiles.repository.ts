@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IProfilesRepository } from "src/core/profiles/abstraction/profiles-repository.interface";
-import { Profile } from "src/core/profiles/entities/profile.entity";
+import { IProfilesRepository } from "../../../../core/profiles/abstraction/profiles-repository.interface";
+import { Profile } from "../../../../core/profiles/entities/profile.entity";
 import { Repository } from "typeorm/repository/Repository";
 
 @Injectable()

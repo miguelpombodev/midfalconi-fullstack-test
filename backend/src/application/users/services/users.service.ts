@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { User } from "src/core/users/entities/user.entity";
-import { UsersRepository } from "src/infrastructure/persistence/repositories/users/users.repository";
+import { User } from "../../../core/users/entities/user.entity";
+import { UsersRepository } from "../../../infrastructure/persistence/repositories/users/users.repository";
 import { CreateUserRequest } from "../contracts/createUser.request";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
 
@@ -87,8 +87,8 @@ export class UsersService {
       );
       throw new NotFoundException("User not found");
     }
-    const user = await this._usersRepository.getById(userId);
-    return user;
+
+    return checkUser;
   }
 
   async updateUserAsync(

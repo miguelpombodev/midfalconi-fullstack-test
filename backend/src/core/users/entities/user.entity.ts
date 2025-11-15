@@ -1,6 +1,5 @@
-import { Column } from "typeorm/decorator/columns/Column";
 import { BaseEntity } from "../../common/base.entity";
-import { Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, Column } from "typeorm";
 import { Profile } from "../../profiles/entities/profile.entity";
 import { UserBuilder } from "../builder/user.builder";
 
