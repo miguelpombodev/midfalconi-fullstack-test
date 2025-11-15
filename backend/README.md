@@ -15,6 +15,7 @@ A robust NestJS backend application demonstrating enterprise-level architecture 
 - [Installation & Setup](#installation--setup)
 - [Environment Variables](#environment-variables)
 - [Caching with Redis](#caching-with-redis)
+- [Distributed Tracing with Jaeger & OTEL](#distributed-tracing-with-jaeger--otel)
 - [Running the Application](#running-the-application)
 - [Database Management](#database-management)
 - [API Documentation](#api-documentation)
@@ -295,6 +296,160 @@ DBSIZE                  # Number of keys
 KEYS *                  # List all keys
 FLUSHDB                 # Clear current database
 FLUSHALL                # Clear all databases
+```
+
+## 🔍 Distributed Tracing with Jaeger & OTEL
+
+### Overview
+
+This project integrates **OpenTelemetry (OTEL)** and **Jaeger** for distributed tracing capabilities. This enables comprehensive observability by tracking requests through the entire application stack, helping you identify performance bottlenecks, debug issues, and understand service interactions.
+
+### What is Distributed Tracing?
+
+Distributed tracing provides end-to-end visibility into request flows across services:
+- **Trace**: A complete request journey through the system
+- **Span**: Individual operation within a trace (e.g., database query, API call)
+- **Attributes**: Key-value metadata attached to spans
+
+### Setting Up Jaeger
+
+#### 1. Running Jaeger with Docker
+
+```bash
+# Start Jaeger all-in-one container
+docker run -d \
+  --name jaeger \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 14250:14250 \
+  jaegertracing/all-in-one:latest
+
+# Stop Jaeger
+docker stop jaeger
+
+# Remove Jaeger container
+docker rm jaeger
+```
+
+#### 2. Running Jaeger with Docker Compose
+
+The `docker-compose.development.yaml` includes Jaeger service configuration:
+
+```bash
+docker-compose -f docker-compose.development.yaml up
+```
+
+### Accessing Jaeger UI
+
+Once Jaeger is running, access the UI at:
+
+```
+http://localhost:16686/trace/
+```
+
+#### Features in Jaeger UI:
+
+- **Service Selection**: Choose which service's traces to view
+- **Trace Search**: Filter by operation name, tags, duration, and more
+- **Trace Details**: Inspect individual spans, timing, and metadata
+- **Latency Analysis**: Identify slow operations within requests
+- **Service Dependency Graph**: Visualize how services communicate
+
+### Environment Variables for OTEL
+
+Configure OTEL behavior with these environment variables:
+
+```env
+# OpenTelemetry Configuration
+OTEL_SDK_ENABLED=true
+OTEL_SERVICE_NAME=falconi-backend
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+OTEL_EXPORTER_OTLP_HEADERS=
+OTEL_TRACES_EXPORTER=otlp
+OTEL_NODE_ENABLED_INSTRUMENTATIONS=http,express,pg,typeorm
+```
+
+### Instrumentation
+
+The project includes an `instrumentation.ts` file that automatically instruments the application with OTEL:
+
+**Location**: `src/instrumentation.ts`
+
+This file is loaded before the application starts and automatically captures:
+- HTTP request/response tracing
+- Database queries
+- Service interactions
+- Custom spans from business logic
+
+### Example: Creating Custom Spans
+
+```typescript
+import { trace } from '@opentelemetry/api';
+
+const tracer = trace.getTracer('my-service');
+
+async function processUser(userId: string) {
+  const span = tracer.startSpan('processUser');
+  
+  try {
+    span.setAttributes({
+      'user.id': userId,
+      'operation.type': 'process',
+    });
+
+    // Your business logic here
+    const user = await this.findUser(userId);
+    
+    span.setStatus({ code: SpanStatusCode.OK });
+    return user;
+  } catch (error) {
+    span.recordException(error);
+    span.setStatus({ 
+      code: SpanStatusCode.ERROR,
+      message: error.message 
+    });
+    throw error;
+  } finally {
+    span.end();
+  }
+}
+```
+
+### Best Practices
+
+1. **Service Naming**: Use descriptive service names for easy identification
+2. **Span Attributes**: Add meaningful attributes to help with debugging
+3. **Error Tracking**: Always record exceptions in spans
+4. **Sampling**: In production, use sampling to reduce storage costs
+5. **Performance**: Disable tracing in performance-critical paths if needed
+
+### Monitoring Tips
+
+1. **Trace Every Request**: All incoming HTTP requests are automatically traced
+2. **Database Operations**: All database queries appear as spans
+3. **Error Detection**: Red traces indicate errors or exceptions
+4. **Performance Bottlenecks**: Look for spans with long durations
+5. **Service Dependencies**: View the service topology in the Jaeger UI
+
+### Useful Jaeger Queries
+
+In the Jaeger UI search, try these queries:
+
+```
+# All traces for a service
+service.name = "falconi-backend"
+
+# Traces with errors
+error = true
+
+# Slow operations (>500ms)
+duration > 500ms
+
+# Specific operation
+operation = "POST /users"
+
+# With tags
+span.tags."user.id" = "550e8400-e29b-41d4-a716-446655440000"
 ```
 
 ## ▶️ Running the Application
