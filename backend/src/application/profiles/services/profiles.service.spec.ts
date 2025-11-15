@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ProfilesService } from "./profiles.service";
-import { ProfilesRepository } from "../../../infrastructure/persistence/repositories/profiles/profiles.repository";
-import { Profile } from "../../../core/profiles/entities/profile.entity";
+import { ProfilesRepository } from "src/infrastructure/persistence/repositories/profiles/profiles.repository";
+import { Profile } from "src/core/profiles/entities/profile.entity";
 
 const profileFixture: Profile = {
   id: "p1r2o3f4-e5f6-7890-a1b2-c3d4e5f67890",

@@ -2,20 +2,20 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
 import * as request from "supertest";
 import { UsersController } from "./users.controller";
-import { UsersService } from "../../../application/users/services/users.service";
+import { UsersService } from "src/application/users/services/users.service";
 import { CACHE_MANAGER, CacheInterceptor } from "@nestjs/cache-manager";
 import {
   mockCacheInterceptor,
   mockCacheManager,
   mockLogger,
   mockUsersService,
-} from "../../../../test/mocks/user.mocks";
+} from "test/mocks/user.mocks";
 import { getLoggerToken } from "nestjs-pino";
 import {
   CreateUserRequestFixture,
   updateUserRequestFixture,
   userFixture,
-} from "../../../../test/fixtures/user.fixtures";
+} from "test/fixtures/user.fixtures";
 
 describe("UsersController", () => {
   let app: INestApplication;

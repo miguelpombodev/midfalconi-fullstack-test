@@ -2,13 +2,13 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import * as request from "supertest";
 import { ProfileController } from "./profile.controller";
-import { ProfilesService } from "../../../application/profiles/services/profiles.service";
+import { ProfilesService } from "src/application/profiles/services/profiles.service";
 import { CacheInterceptor } from "@nestjs/cache-manager";
 import {
   mockCacheInterceptor,
   mockProfilesService,
-} from "../../../../test/mocks/profile.mocks";
-import { profilesListFixture } from "../../../../test/fixtures/profile.fixtures";
+} from "test/mocks/profile.mocks";
+import { profilesListFixture } from "test/fixtures/profile.fixtures";
 
 describe("ProfileController", () => {
   let app: INestApplication;

@@ -17,7 +17,7 @@
     "migration:revert": "pnpm typeorm migration:revert",
     "typeorm:prod": "node ./node_modules/typeorm/cli.js --dataSource dist/infrastructure/persistence/config/data-source.config.js",
     "migration:run:prod": "pnpm typeorm:prod migration:run",
-    "seed:config": "pnpm ts-node ./node_modules/typeorm-seeding/dist/cli.js -n src/infrastructure/persistence/config/database-seed.config.ts",
+    "seed:config": "pnpm ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli.js -n src/infrastructure/persistence/config/database-seed.config.ts",
     "seed:run": "pnpm run seed:config seed",
     "seed:config:prod": "node ./node_modules/typeorm-seeding/dist/cli.js -n src/infrastructure/persistence/config/database-seed.config.js",
     "seed:run:prod": "pnpm run seed:config:prod seed",
@@ -101,8 +101,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": "src/.*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
@@ -110,6 +109,10 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^test/(.*)$": "<rootDir>/test/$1"
+    }
   }
 }

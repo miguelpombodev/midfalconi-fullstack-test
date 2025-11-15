@@ -1,16 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UsersService } from "./users.service";
-import { UsersRepository } from "../../../infrastructure/persistence/repositories/users/users.repository";
-import {
-  mockLogger,
-  mockUsersRepository,
-} from "../../../../test/mocks/user.mocks";
+import { UsersRepository } from "src/infrastructure/persistence/repositories/users/users.repository";
+import { mockLogger, mockUsersRepository } from "test/mocks/user.mocks";
 import { getLoggerToken } from "nestjs-pino";
 import {
   CreateUserRequestFixture,
   userFixture,
-} from "../../../../test/fixtures/user.fixtures";
-import { User } from "../../../core/users/entities/user.entity";
+} from "test/fixtures/user.fixtures";
+import { User } from "src/core/users/entities/user.entity";
 import { NotFoundException } from "@nestjs/common";
 
 describe("UsersService", () => {
